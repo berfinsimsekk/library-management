@@ -17,8 +17,8 @@ This project is a Library Management System that allows users to borrow and retu
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/berfinsimsekk/invent-case.git
-cd invent-case
+git clone https://github.com/berfinsimsekk/library-management.git
+cd library-management
 npm install
 ```
 
