@@ -25,11 +25,11 @@ sequelize.sync()
   .then(() => console.log('Database synced'))
   .catch(err => console.error('Error syncing database:', err));
 
-//  sequelize.query('SET FOREIGN_KEY_CHECKS = 0')
-//  .then(() => sequelize.sync({ force: true }))
-//  .then(() => sequelize.query('SET FOREIGN_KEY_CHECKS = 1'))
-//  .then(() => console.log('Database synced with foreign key checks disabled'))
-//  .catch(err => console.error('Error syncing database:', err));
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Internal Server Error:', err);
+  res.status(500).json({ error: 'Internal Server Error. Please try again later.' });
+});
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

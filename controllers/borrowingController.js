@@ -8,6 +8,14 @@ const { Op } = require('sequelize');
 const borrowBook = async (req, res) => {
     const { userId, bookId } = req.params;
     try {
+
+      const existingBorrowing = await Borrowing.findOne({
+        where: { bookId, returnedAt: null },
+      });
+  
+      if (existingBorrowing) {
+        return res.status(400).send('Book is already borrowed.');
+      }
       const user = await User.findByPk(userId);
       const book = await Book.findByPk(bookId);
   
@@ -44,7 +52,7 @@ const returnBook = async (req, res) => {
       }
 
       borrowing.returnedAt = new Date();
-      borrowing.rating = score; // Assuming you want to save it as rating in the Borrowing model
+      borrowing.rating = score; 
       await borrowing.save();
 
       // Update book's average rating
@@ -60,7 +68,7 @@ const returnBook = async (req, res) => {
       }
       await book.save();
 
-      res.status(200).send('Book returned and rated');
+      res.status(200).send('Book returned');
   } catch (err) {
       res.status(500).send(err.message);
   }
