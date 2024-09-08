@@ -4,6 +4,21 @@ const Borrowing = require('../models/borrowing');
 const User = require('../models/user');
 const Book = require('../models/book');
 const { Op } = require('sequelize');
+const redis = require('redis');
+
+const client = redis.createClient();
+let isRedisConnected = false; 
+
+
+client.connect()
+  .then(() => {
+    isRedisConnected = true;
+    console.log('Connected to Redis');
+  })
+  .catch((error) => {
+    isRedisConnected = false;
+    console.error('Redis connection failed:', error.message);
+  });
 
 const borrowBook = async (req, res) => {
     const { userId, bookId } = req.params;
@@ -32,6 +47,14 @@ const borrowBook = async (req, res) => {
       }
   
       await Borrowing.create({ userId, bookId });
+
+      if (isRedisConnected) {
+
+        await client.del('books'); 
+        await client.del(`book:${bookId}`); 
+      }
+
+
       res.status(200).send('Book borrowed');
     } catch (err) {
       res.status(500).send(err.message);
@@ -67,6 +90,11 @@ const returnBook = async (req, res) => {
           book.rating = null; // or 0 if you want to show a default value
       }
       await book.save();
+
+      if (isRedisConnected) {
+        await client.del('books'); 
+        await client.del(`book:${bookId}`); 
+      }
 
       res.status(200).send('Book returned');
   } catch (err) {
