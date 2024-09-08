@@ -70,6 +70,9 @@ const createBook = async (req, res) => {
   const { name, rating } = req.body;
   try {
     await Book.create({ name, rating });
+    if (isRedisConnected) {
+      await client.del('books'); 
+    }
     res.status(201).send('Book created');
   } catch (err) {
     res.status(500).send(err.message);
